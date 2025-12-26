@@ -28,7 +28,7 @@ export function AuthGuard({ children }: { children: React.ReactElement }) {
   if (loading) return null
 
   if (!session) {
-    return <Navigate to="/login" replace />
+    return <Navigate to="/" replace />
   }
 
   return children

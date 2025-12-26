@@ -14,7 +14,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadSession() {
       const { data }: { data: { session: any } } = await supabase.auth.getSession()
-      
+
 
       if (!data.session) return
 
@@ -24,7 +24,7 @@ export default function Dashboard() {
       setPapel(user.user_metadata?.papel ?? "user")
       setClinicas(user.user_metadata?.clinicas ?? [])
 
-      // Store token in localStorage
+      
       if (data.session.access_token) {
         localStorage.setItem("loginToken", data.session.access_token)
       }
@@ -35,11 +35,11 @@ export default function Dashboard() {
 
   async function logout() {
     await supabase.auth.signOut()
-    window.location.href = "/login"
+    window.location.href = "/"
   }
 
   function acessarClinica(id: string) {
-    // exemplo: redirecionar passando o token
+    
     supabase.auth.getSession().then(({ data }: { data: { session: any } }) => {
       if (!data.session) return
 
@@ -51,39 +51,49 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>SSO Dashboard</h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-md space-y-6">
+        <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">SSO Dashboard</h2>
 
-      <p><strong>Email:</strong> {email}</p>
-      <p><strong>Papel global:</strong> {papel}</p>
+        <div className="space-y-1">
+          <p className="text-slate-700"><strong>Email:</strong> {email}</p>
+          <p className="text-slate-700"><strong>Papel global:</strong> {papel}</p>
+        </div>
 
-      <hr />
+        <hr />
 
-      <h3>Clínicas disponíveis</h3>
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800 mb-2">Clínicas disponíveis</h3>
+          {clinicas.length === 0 ? (
+            <p className="text-slate-500">Você não possui clínicas vinculadas.</p>
+          ) : (
+            <ul className="space-y-2">
+              {clinicas.map(c => (
+                <li key={c.id_clinica} className="flex items-center justify-between bg-slate-50 rounded-lg px-4 py-2">
+                  <span>
+                    <span className="font-medium">Clínica {c.id_clinica}</span> <span className="text-slate-500">— papel: {c.papel}</span>
+                  </span>
+                  <button
+                    className="ml-4 bg-blue-600 text-white px-3 py-1 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    onClick={() => acessarClinica(c.id_clinica)}
+                  >
+                    Acessar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      {clinicas.length === 0 && (
-        <p>Você não possui clínicas vinculadas.</p>
-      )}
+        <hr />
 
-      <ul>
-        {clinicas.map(c => (
-          <li key={c.id_clinica}>
-            Clínica {c.id_clinica} — papel: {c.papel}
-            <button
-              style={{ marginLeft: 10 }}
-              onClick={() => acessarClinica(c.id_clinica)}
-            >
-              Acessar
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <hr />
-
-      <button onClick={logout}>
-        Logout
-      </button>
+        <button
+          onClick={logout}
+          className="w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+        >
+          Logout
+        </button>
+      </div>
     </div>
   )
 }
